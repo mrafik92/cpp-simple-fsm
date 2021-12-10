@@ -58,11 +58,11 @@ struct State2 : public State {
 };
 
 auto pFunction1 = []() {
-    std::cout << "Action1() with args = " << "\n";
+    std::cout << "Action1() " << "\n";
 };
 
 auto pFunction2 = []() {
-    std::cout << "Action2() with args = "
+    std::cout << "Action2() "
               << "\n";
 };
 
