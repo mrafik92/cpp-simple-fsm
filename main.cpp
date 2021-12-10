@@ -6,11 +6,6 @@
 #include <utility>
 #include <vector>
 
-//enum class Event {
-//    EVENT1,
-//    EVENT2
-//};
-
 #define typeName(y) typeid(y).name()
 
 enum class Events : int {
@@ -46,6 +41,7 @@ struct State1 : public State {
     void onEntry() override {
         std::cout << "State1 onEntry\n";
     }
+
     void onExit() override {
         std::cout << "State1 onExit\n";
     }
@@ -55,11 +51,11 @@ struct State2 : public State {
     void onEntry() override {
         std::cout << "State2 onEntry\n";
     }
+
     void onExit() override {
         std::cout << "State2 onExit\n";
     }
 };
-
 
 auto pFunction1 = []() {
     std::cout << "Action1() with args = " << "\n";
@@ -70,7 +66,6 @@ auto pFunction2 = []() {
               << "\n";
 };
 
-
 class Fsm {
 public:
     Fsm() {}
@@ -78,7 +73,6 @@ public:
     template<class Event>
     void processEvent(Event event) {
         for (auto &transition: mTransitions) {
-            //std::cout << transition.mCurrentState << "   " <<  typeName(*mCurrentState) << "\n";
             if (transition.mEvent == event && transition.mCurrentState == typeName(*mCurrentState)) {
                 // process event
                 std::shared_ptr<State> &state = mStates[typeName(*mCurrentState)];
@@ -106,8 +100,5 @@ private:
 int main() {
     Fsm fsm{};
     fsm.processEvent(Events::Event1);
-
-    std::cout << "XXXXXXXXXXX next action\n";
-
     fsm.processEvent(Events::Event2);
 }
