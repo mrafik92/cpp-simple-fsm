@@ -8,4 +8,4 @@ The transition class holds all the allowed transitions in the form of
 
 src_state -> event -> action -> destination_state
 
-![alt text](https://github.com/mrafik92/cpp-simple-fsm/blob/master/doc/design.png?raw=true)
+![alt text](https://github.com/mrafik92/cpp-simple-fsm/blob/master/doc/fsm_backend.jpg?raw=true)
