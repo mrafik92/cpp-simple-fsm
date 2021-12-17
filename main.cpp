@@ -6,12 +6,7 @@
 #include <utility>
 #include <vector>
 
-#define typeName(y) typeid(y).name()
-
-enum class Events : int {
-    Event1,
-    Event2
-};
+#define state(y) typeid(y).name()
 
 struct State {
     virtual void onEntry() = 0;
@@ -19,52 +14,106 @@ struct State {
 };
 
 
+enum class Events : int {
+    Event1 = 1 << 0,
+    ReceivedHashesAck = 1 << 1,
+    Event2 = 1 << 2,
+    Event3 = 1 << 3,
+    Event4 = 1 << 4,
+    Event5 = 1 << 5,
+    Event6 = 1 << 6,
+};
+
+class Manager {
+public:
+    void publishHashes() {
+        std::cout << "publishHashes()\n";
+    };
+    void checkifhashesarematching() {
+    }
+} mManager;
+
+
 class Transition {
 public:
     Transition(std::string mCurrentState,
                Events mEvent,
-               std::function<void()> action,
+               void (Manager::*action)(),
+               std::function<bool()> guard,
                std::string mNextState)
 
-        : mCurrentState(std::move(mCurrentState)),
+        : mStartState(std::move(mCurrentState)),
           mNextState(std::move(mNextState)),
           mEvent(mEvent),
-          action(std::move(action)) {}
+          mAction(std::move(std::bind(action, mManager))),
+          mGuard(std::move(guard)) {
+    }
 
-    std::string mCurrentState;
+    std::string mStartState;
     std::string mNextState;
     Events mEvent;
-    std::function<void()> action;
+    std::function<void()> mAction;
+    std::function<bool()> mGuard;
 };
 
-struct State1 : public State {
+struct Idle : public State {
     void onEntry() override {
-        std::cout << "State1 onEntry\n";
+        std::cout << "Idle onEntry\n";
     }
 
     void onExit() override {
-        std::cout << "State1 onExit\n";
+        std::cout << "Idle onExit\n";
     }
 };
 
-struct State2 : public State {
+struct InhibitWaiting : public State {
     void onEntry() override {
-        std::cout << "State2 onEntry\n";
+        std::cout << "InhibitWaiting onEntry\n";
     }
 
     void onExit() override {
-        std::cout << "State2 onExit\n";
+        std::cout << "InhibitWaiting onExit\n";
     }
 };
 
-auto pFunction1 = []() {
-    std::cout << "Action1() " << "\n";
+
+inline Events operator|(Events a, Events b) {
+    return static_cast<Events>(static_cast<int>(a) | static_cast<int>(b));
+}
+
+inline bool operator&(Events a, Events b) {
+    return ((static_cast<int>(a) & static_cast<int>(b)) != 0);
+}
+
+
+auto transitFromState1ToState2 = []() {
+    std::cout << "transitFromState1ToState2() "
+              << "\n";
+};
+
+auto NO_ACTION = []() {
+    std::cout << "NO_ACTION() "
+              << "\n";
+};
+
+auto allHashesAreMatching = []() {
+    std::cout << "allHashesAreMatching() true "
+              << "\n";
+    return true;
+};
+
+auto notAllHashesAreMatching = []() {
+    std::cout << "notAllHashesAreMatching() false"
+              << "\n";
+    mManager.checkifhashesarematching();
+    return false;
 };
 
 auto pFunction2 = []() {
     std::cout << "Action2() "
               << "\n";
 };
+
 
 class Fsm {
 public:
@@ -73,28 +122,39 @@ public:
     template<class Event>
     void processEvent(Event event) {
         for (auto &transition: mTransitions) {
-            if (transition.mEvent == event && transition.mCurrentState == typeName(*mCurrentState)) {
-                // process event
-                std::shared_ptr<State> &state = mStates[typeName(*mCurrentState)];
-                state->onExit();
-                transition.action();
-                state->onEntry();
 
-                mCurrentState = mStates[transition.mNextState];
+            // void (Manager::*pFunction)() = &Manager::checkifhashesarematching;
+
+            if ((transition.mEvent & event) && transition.mStartState == state(*mCurrentState)) {
+                if (transition.mGuard()) {
+                    // process event
+                    std::shared_ptr<State> &state = mStates[state(*mCurrentState)];
+                    state->onExit();
+                    transition.mAction();
+                    mCurrentState = mStates[transition.mNextState];
+                    mCurrentState->onEntry();
+                    break;
+
+                }
             }
         }
     }
 
 private:
+    Manager mHashesManager{};
+
     std::map<std::string, std::shared_ptr<State>> mStates{
-            {typeName(State1), std::make_shared<State1>()},
-            {typeName(State2), std::make_shared<State2>()},
+            {state(Idle), std::make_shared<Idle>()},
+            {state(InhibitWaiting), std::make_shared<InhibitWaiting>()},
     };
 
-    std::shared_ptr<State> mCurrentState = std::make_shared<State1>();
+    std::shared_ptr<State> mCurrentState = std::make_shared<Idle>();
     std::vector<Transition> mTransitions{
-            {typeName(State1), Events::Event1, pFunction1, typeName(State2)},
-            {typeName(State2), Events::Event2, pFunction2, typeName(State1)}};
+            //      Source State                         Event                                    action                      Target State
+            {state(Idle), Events::ReceivedHashesAck, &Manager::publishHashes, notAllHashesAreMatching, state(InhibitWaiting)},
+            {state(Idle), Events::Event1 | Events::Event2, &Manager::publishHashes, allHashesAreMatching, state(InhibitWaiting)},
+            {state(InhibitWaiting), Events::Event2 | Events::Event3, &Manager::publishHashes, allHashesAreMatching, state(Idle)}
+    };
 };
 
 int main() {
