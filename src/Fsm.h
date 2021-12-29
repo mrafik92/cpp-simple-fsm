@@ -11,9 +11,9 @@
 #include <map>
 #include <vector>
 
-#define state(y) typeid(y).name()
-#define action(y) [this]() { y(); }
-#define guard(y) [this]() { return y(); }
+#define fsmState(y) typeid(y).name()
+#define fsmAction(y) [this]() { y(); }
+#define fsmGuard(y) [this]() { return y(); }
 
 class Fsm {
 public:
@@ -24,7 +24,7 @@ public:
           mStates(),
           mCurrentState(std::move(initialState)) {
         for (auto item: states) {
-            mStates[state(*item)] = item;
+            mStates[fsmState(*item)] = item;
         }
     };
 
