@@ -44,10 +44,11 @@ private:
 
     // clang-format off
     std::vector<Transition> mTransitions{
-            //Source State          Event                               fsmAction                  fsmGuard                       Target State
-            {fsmState(Idle),        Event::Event1,                      fsmAction(doSomething),    fsmGuard(failingCondition),    fsmState(Waiting)},
-            {fsmState(Idle),        Event::Event1 | Event::Event2,      fsmAction(doSomething),    fsmGuard(passingCondition),    fsmState(Waiting)},
-            {fsmState(Waiting),     Event::Event2 | Event::Event3,      fsmAction(doSomething),    fsmGuard(passingCondition),    fsmState(Idle)}};
+        //Source State          Event                               fsmAction                  fsmGuard                       Target State
+        {fsmState(Idle),        Event::Event1,                      fsmAction(doSomething),    fsmGuard(failingCondition),    fsmState(Waiting)},
+        {fsmState(Idle),        Event::Event1 | Event::Event2,      fsmAction(doSomething),    fsmGuard(passingCondition),    fsmState(Waiting)},
+        {fsmState(Waiting),     Event::Event2 | Event::Event3,      fsmAction(doSomething),    fsmGuard(passingCondition),    fsmState(Idle)}
+    };
     // clang-format on
 
     Fsm fsm;
