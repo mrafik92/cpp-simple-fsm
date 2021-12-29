@@ -45,7 +45,7 @@ private:
     // clang-format off
     std::vector<Transition> mTransitions{
             //Source State      Event                               action                  guard                       Target State
-            {state(Idle),       Event::Event3,                      action(doSomething),    guard(failingCondition),    state(Waiting)},
+            {state(Idle),       Event::Event1,                      action(doSomething),    guard(failingCondition),    state(Waiting)},
             {state(Idle),       Event::Event1 | Event::Event2,      action(doSomething),    guard(passingCondition),    state(Waiting)},
             {state(Waiting),    Event::Event2 | Event::Event3,      action(doSomething),    guard(passingCondition),    state(Idle)}};
     // clang-format on
