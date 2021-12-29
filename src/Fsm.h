@@ -6,14 +6,14 @@
 #define FSMIMPL_FSM_H
 
 
-#include <vector>
-#include <map>
-#include "Transition.h"
 #include "State.h"
+#include "Transition.h"
+#include <map>
+#include <vector>
 
 #define state(y) typeid(y).name()
-#define action(y) std::bind(&Manager::y, this)
-#define guard(y) std::bind(&Manager::y, this)
+#define action(y) [this]() { y(); }
+#define guard(y) [this]() { return y(); }
 
 class Fsm {
 public:
@@ -22,8 +22,7 @@ public:
                  std::shared_ptr<State> initialState)
         : mTransitions(std::move(transition)),
           mStates(),
-          mCurrentState(std::move(initialState))
-    {
+          mCurrentState(std::move(initialState)) {
         for (auto item: states) {
             mStates[state(*item)] = item;
         }

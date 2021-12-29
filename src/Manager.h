@@ -22,7 +22,6 @@ public:
     }
 
 private:
-
     bool passingCondition() {
         std::cout << "passingCondition() true "
                   << "\n";
@@ -39,16 +38,17 @@ private:
         std::cout << "doSomething()\n";
     }
 
-    std::vector<std::shared_ptr<State>> mStates {
+    std::vector<std::shared_ptr<State>> mStates{
             std::make_shared<Idle>(),
-            std::make_shared<Waiting>()
-    };
+            std::make_shared<Waiting>()};
 
+    // clang-format off
     std::vector<Transition> mTransitions{
-            //      Source State                         Event                                    action                      Target State
-            {state(Idle), Event::Event3, action(doSomething), guard(failingCondition), state(Waiting)},
-            {state(Idle), Event::Event1 | Event::Event2, action(doSomething), guard(passingCondition), state(Waiting)},
-            {state(Waiting), Event::Event2 | Event::Event3, action(doSomething), guard(passingCondition), state(Idle)}};
+            //Source State      Event                               action                  guard                       Target State
+            {state(Idle),       Event::Event3,                      action(doSomething),    guard(failingCondition),    state(Waiting)},
+            {state(Idle),       Event::Event1 | Event::Event2,      action(doSomething),    guard(passingCondition),    state(Waiting)},
+            {state(Waiting),    Event::Event2 | Event::Event3,      action(doSomething),    guard(passingCondition),    state(Idle)}};
+    // clang-format on
 
     Fsm fsm;
 };
