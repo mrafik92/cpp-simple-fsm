@@ -6,14 +6,10 @@
 #define FSMIMPL_FSM_H
 
 
-#include "State.h"
-#include "StateIdle.h"
-#include "StateWaiting.h"
-#include "Transition.h"
-#include <map>
-#include <memory>
-#include <utility>
 #include <vector>
+#include <map>
+#include "Transition.h"
+#include "State.h"
 
 #define state(y) typeid(y).name()
 #define action(y) std::bind(&Manager::y, this)

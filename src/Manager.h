@@ -6,8 +6,11 @@
 #define FSMIMPL_MANAGER_H
 
 #include <iostream>
-#include "Fsm.h"
+#include <memory>
 
+#include "Fsm.h"
+#include "StateIdle.h"
+#include "StateWaiting.h"
 
 class Manager {
 
@@ -19,6 +22,7 @@ public:
     }
 
 private:
+
     bool passingCondition() {
         std::cout << "passingCondition() true "
                   << "\n";
@@ -28,15 +32,11 @@ private:
     bool failingCondition() {
         std::cout << "failingCondition() false"
                   << "\n";
-
         return false;
     };
 
-    void publishHashes() {
-        std::cout << "publishHashes()\n";
-    }
-
-    void checkifhashesarematching() {
+    void doSomething() {
+        std::cout << "doSomething()\n";
     }
 
     std::vector<std::shared_ptr<State>> mStates {
@@ -46,14 +46,11 @@ private:
 
     std::vector<Transition> mTransitions{
             //      Source State                         Event                                    action                      Target State
-            {state(Idle), Event::Event3, action(publishHashes), guard(failingCondition), state(Waiting)},
-            {state(Idle), Event::Event1 | Event::Event2, action(publishHashes), guard(passingCondition), state(Waiting)},
-            {state(Waiting), Event::Event2 | Event::Event3, action(publishHashes), guard(passingCondition), state(Idle)}};
+            {state(Idle), Event::Event3, action(doSomething), guard(failingCondition), state(Waiting)},
+            {state(Idle), Event::Event1 | Event::Event2, action(doSomething), guard(passingCondition), state(Waiting)},
+            {state(Waiting), Event::Event2 | Event::Event3, action(doSomething), guard(passingCondition), state(Idle)}};
 
     Fsm fsm;
-
-
-
 };
 
 
