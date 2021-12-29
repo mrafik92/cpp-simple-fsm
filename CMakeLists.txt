@@ -3,4 +3,4 @@ project(fsmImpl)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(fsmImpl main.cpp)
+add_executable(fsmImpl src/main.cpp src/Manager.cpp src/Fsm.cpp)
